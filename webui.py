@@ -253,12 +253,6 @@ def generate_clicked(*args):
     for key, val in zip(state["ctrls_name"], args):
         gen_data[key] = val
 
-    # FIXME this is _ugly_ run_event gets triggerd once at page load
-    #   not really gradios fault, we are doing silly things there. :)
-    if gen_data["run_event"] < 1:
-        yield update_results(["html/logo.png"])
-        return
-
     gen_data["generate_forever"] = int(gen_data["image_number"]) == 0
 
     # Check for preset image
@@ -363,8 +357,9 @@ with shared.gradio_root as block:
                 allow_preview=False,
                 preview=False,
                 interactive=False,
-                visible=True,
+                visible='hidden',
                 buttons=['download', 'share', 'fullscreen'],
+                value=["html/init_image.png"],
             )
 
             @gallery.select(
@@ -652,18 +647,19 @@ with shared.gradio_root as block:
                         else:
                             return gr.update()
 
+                    style_button = gr.Button(value="⬅️ " + t("Send Style to prompt"), size="sm")
                     style_selection = gr.Dropdown(
                         label=t("Style Selection"),
                         multiselect=True,
                         container=True,
                         choices=list(load_styles().keys()),
+                        buttons=[style_button],
                         value=list(
                             set(settings["style"]) &
                             set(load_styles().keys())
                         ),
                     )
                     add_ctrl("style_selection", style_selection)
-                style_button = gr.Button(value="⬅️ " + t("Send Style to prompt"), size="sm")
                 image_number = gr.Slider(
                     label=t("Image Number"),
                     minimum=0,
