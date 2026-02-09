@@ -1,5 +1,6 @@
 ### development
-* Gradio 6.4
+* Gradio 6.5.1
+* Bumped ComfyUI and GGUF version
 * Bugfixes
 
 ### 26.01.13
