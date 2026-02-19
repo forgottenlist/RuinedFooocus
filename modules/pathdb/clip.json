@@ -79,6 +79,11 @@
         "path": "path_clip",
         "filename": "qwen_2.5_vl_7b_fp8_scaled.safetensors"
     },
+    "clip/qwen_3_06b_base.safetensors": {
+        "url": "https://huggingface.co/circlestone-labs/Anima/resolve/main/split_files/text_encoders/qwen_3_06b_base.safetensors",
+        "path": "path_clip",
+        "filename": "qwen_3_06b_base.safetensors"
+    },
     "clip/qwen_3_4b.safetensors": {
         "url": "https://huggingface.co/Comfy-Org/z_image_turbo/blob/main/split_files/text_encoders/qwen_3_4b.safetensors",
         "path": "path_clip",

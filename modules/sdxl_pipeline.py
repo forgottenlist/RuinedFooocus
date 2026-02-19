@@ -138,6 +138,7 @@ class pipeline:
             "clip_mistral3": "mistral_3_small_flux2_fp8.safetensors",
             "clip_qwen25": "qwen_2.5_vl_7b_edit-q2_k.gguf",
             "clip_qwen3": "Qwen3-4B-Q4_K_M.gguf",
+            "clip_qwen3_06b": "qwen_3_06b_base.safetensors",
             "clip_oldt5": "t5xxl_old_fp32-q4_0.gguf",
             "clip_t5": "t5-v1_1-xxl-encoder-Q3_K_S.gguf",
         }
@@ -159,7 +160,7 @@ class pipeline:
         }
         return settings.default_settings.get(shortname, defaults[shortname] if shortname in defaults else None)
 
-    known_models = ["AuraFlow", "BaseModel", "CosmosPredict2", "Flux", "Flux2", "HiDream", "Lumina2", "NewBieImage", "PixArt", "QwenImage", "SD3", "SDXL", "ZImage"]
+    known_models = ["Anima", "AuraFlow", "BaseModel", "CosmosPredict2", "Flux", "Flux2", "HiDream", "Lumina2", "NewBieImage", "PixArt", "QwenImage", "SD3", "SDXL", "ZImage"]
     def get_clip_and_vae(self, unet):
         unet_type = unet.model.__class__.__name__
 
@@ -175,6 +176,13 @@ class pipeline:
         # Simple workflows with "Load models"->"Sample"->"VAE" might work right away.
         # Add new clip/vae models to settings and pathdb-files.
         model_info = {
+            "Anima": {
+                "latent": "SD3",
+                "clip_type": comfy.sd.CLIPType.COSMOS,
+                "clip_names": [self.get_clip_name("clip_qwen3_06b")],
+                "vae_name": self.get_vae_name("vae_qwen_image"),
+                "model_sampling": ('AuraFlow', settings.default_settings.get("anima_image_shift", 5.0)),
+            },
             "AuraFlow": {
                 "clip_type": comfy.sd.CLIPType.STABLE_DIFFUSION,
                 "clip_names": [self.get_clip_name("clip_aura")],

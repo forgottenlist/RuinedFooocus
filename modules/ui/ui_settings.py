@@ -239,6 +239,8 @@ def create_settings():
                 clip_qwen25 = gr.Dropdown(label="clip_qwen25", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_qwen25", None),)
                 add_setting("clip_qwen25", clip_qwen25)
                 clip_qwen3 = gr.Dropdown(label="clip_qwen3", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_qwen3", None),)
+                add_setting("clip_qwen3_06b", clip_qwen3_06b)
+                clip_qwen3_06b = gr.Dropdown(label="clip_qwen3_06b", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_qwen3_06b", None),)
                 add_setting("clip_qwen3", clip_qwen3)
                 clip_oldt5 = gr.Dropdown(label="clip_oldt5", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_oldt5", None),)
                 add_setting("clip_oldt5", clip_oldt5)
