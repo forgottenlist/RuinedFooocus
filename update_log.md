@@ -1,5 +1,5 @@
 ### development
-* [Anima}(https://huggingface.co/circlestone-labs/Anima) support
+* [Anima](https://huggingface.co/circlestone-labs/Anima) support
 * Gradio 6.6.0
 * Bumped ComfyUI and GGUF version
 * Bugfixes
