@@ -1,3 +1,7 @@
+### devel
+* Gradio 6.10.0
+* Bugfixes
+
 ### 26.03.16
 * [Anima](https://huggingface.co/circlestone-labs/Anima) support
 * Gradio 6.9.0
