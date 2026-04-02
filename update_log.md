@@ -1,4 +1,4 @@
-### devel
+### 26.04.02
 * Gradio 6.10.0 & Torchruntime 2.8.0
 * Fixes for Flux2 models and chatbots
 
