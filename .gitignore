@@ -48,8 +48,8 @@ chatbots/
 presets/
 llamas/
 random_prompt/userfiles/obp_presets.json
-reinstall
-reinstalltorch
+/reinstall
+/reinstalltorch
 prompt_expansion/pytorch_model.bin
 /superprompter/model_files
 models/upscale_models/*.jpeg
