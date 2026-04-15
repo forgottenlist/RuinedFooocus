@@ -236,6 +236,8 @@ def create_settings():
                 add_setting("clip_llama", clip_llama)
                 clip_llava = gr.Dropdown(label="clip_llava", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_llava", None),)
                 add_setting("clip_llava", clip_llava)
+                clip_ministral3 = gr.Dropdown(label="clip_ministral3 (ErnieImage)", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_ministral3", None),)
+                add_setting("clip_ministral3", clip_ministral3)
                 clip_mistral3 = gr.Dropdown(label="clip_mistral3 (Flux2)", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_mistral3", None),)
                 add_setting("clip_mistral3", clip_mistral3)
                 clip_qwen25 = gr.Dropdown(label="clip_qwen25 (QwenImage)", interactive=True, choices=[None]+path_manager.get_folder_list("clip"), value=settings.default_settings.get("clip_qwen25", None),)

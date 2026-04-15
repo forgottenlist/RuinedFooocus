@@ -138,7 +138,7 @@ class pipeline:
                     clip_names = []
 
                     if isinstance(unet.model, LTXAV):
-                        clip_name = settings.default_settings.get("clip_gemma3_12b", "gemma-3-12b-it-Q4_K_S.gguf")
+                        clip_name = settings.default_settings.get("clip_gemma3_12b", "gemma-3-12b-it-qat-UD-Q4_K_XL.gguf")
                         clip_names.append(str(clip_name))
                         clip_path = path_manager.get_folder_file_path(
                             "clip",
@@ -147,7 +147,16 @@ class pipeline:
                         )
                         clip_paths.append(str(clip_path))
 
-                        clip_name = settings.default_settings.get("clip_ltx23_22b_proj", "ltx-2.3-22b_text_projection_bf16.safetensors")
+                        clip_name = settings.default_settings.get("clip_gemma3_12b_mmproj", "gemma-3-12b-it-mmproj-F16.gguf")
+                        clip_names.append(str(clip_name))
+                        clip_path = path_manager.get_folder_file_path(
+                            "clip",
+                            clip_name,
+                            default = os.path.join(path_manager.model_paths["clip_path"], clip_name)
+                        )
+                        clip_paths.append(str(clip_path))
+
+                        clip_name = settings.default_settings.get("clip_ltx23_22b_connwctors", "ltx-2.3-22b-distilled_embeddings_connectors.safetensors")
                         clip_names.append(str(clip_name))
                         clip_path = path_manager.get_folder_file_path(
                             "clip",
@@ -165,19 +174,24 @@ class pipeline:
 
                     print(f"Loading CLIP: {clip_names}")
                     clip_type = comfy.sd.CLIPType.LTXV
-                    if all(name.endswith(".safetensors") for name in clip_paths):
-                        model_options = {}
-                        device = comfy.model_management.get_torch_device()
-                        if device == "cpu":
-                            model_options["load_device"] = model_options["offload_device"] = torch.device("cpu")
-                        clip = comfy.sd.load_clip(ckpt_paths=clip_paths, clip_type=clip_type, model_options=model_options)
-                    else:
+#                    if all(name.endswith(".safetensors") for name in clip_paths):
+#                        model_options = {}
+#                        device = comfy.model_management.get_torch_device()
+#                        if device == "cpu":
+#                            model_options["load_device"] = model_options["offload_device"] = torch.device("cpu")
+#                        clip = comfy.sd.load_clip(ckpt_paths=clip_paths, clip_type=clip_type, model_options=model_options)
+#                    else:
+                    if True:
                         clip_loader = DualCLIPLoaderGGUF()
+                        print(f"DEBUG: load_data")
+                        clip_data = clip_loader.load_data(clip_paths)
+                        print(f"DEBUG: load_patcher")
                         clip = clip_loader.load_patcher(
                             clip_paths,
                             clip_type,
-                            clip_loader.load_data(clip_paths)
+                            clip_data
                         )
+                        print(f"DEBUG: clip done")
 
                     vae_path = path_manager.get_folder_file_path(
                         "vae",

@@ -108,6 +108,177 @@ class pipeline:
             if self.vae is not None:
                 self.vae.first_stage_model.to("meta")
 
+    def get_clip_name(shortname):
+        # List of short names and default names for different text encoders
+        defaults = {
+            "clip_aura": "clip_aura.safetensors",
+            "clip_g": "clip_g.safetensors",
+            "clip_gemma": "gemma_2_2b_fp16.safetensors",
+            "clip_gemma3": "gemma_3_4b_it_bf16.safetensors",
+            "clip_jina": "jina_clip_v2_bf16.safetensors",
+            "clip_l": "clip_l.safetensors",
+            "clip_llama": "llama_q2.gguf",
+            "clip_ministral3": "ministral-3-3b.safetensors",
+            "clip_mistral3": "mistral_3_small_flux2_fp8.safetensors",
+            "clip_qwen25": "qwen_2.5_vl_7b_edit-q2_k.gguf",
+            "clip_qwen3_4b": "Qwen3-4B-Q4_K_M.gguf",
+            "clip_qwen3_8b": "Qwen3-8B-Q8_0.gguf",
+            "clip_qwen3_06b": "qwen_3_06b_base.safetensors",
+            "clip_oldt5": "t5xxl_old_fp32-q4_0.gguf",
+            "clip_t5": "t5-v1_1-xxl-encoder-Q3_K_S.gguf",
+        }
+        return settings.default_settings.get(shortname, defaults[shortname] if shortname in defaults else None)
+
+    def get_vae_name(shortname):
+        # List of short names and default names for different VAE's
+        defaults = {
+            "vae_auraflow": "auraflow_vae_fp32.safetensors",
+            "vae_flux": "ae.safetensors",
+            "vae_flux2": "flux2-vae.safetensors",
+            "vae_lumina2": "lumina2_vae_fp32.safetensors",
+            "vae_pixart": "pixart_vae_fp16.safetensors",
+            "vae_qwen_image": "qwen_image_vae.safetensors",
+            "vae_sd": "sd15_vae.safetensors",
+            "vae_sd3": "sd3_vae.safetensors",
+            "vae_wan": "pig_wan_vae_fp32-f16.gguf", # FIXME
+            "vae_sdxl": "sdxl_vae.safetensors",
+        }
+        return settings.default_settings.get(shortname, defaults[shortname] if shortname in defaults else None)
+
+#        known_models = ["Anima", "AuraFlow", "BaseModel", "CosmosPredict2", "ErnieImage", "Flux", "Flux2", "Flux2Klein4B", "Flux2Klein9B", "HiDream", "Lumina2", "NewBieImage", "PixArt", "QwenImage", "SD3", "SDXL", "ZImage"]
+
+    # Add new model setups here.
+    # Simple workflows with "Load models"->"Sample"->"VAE" might work right away.
+    # Add new clip/vae models to settings and pathdb-files.
+    known_model_info = {
+        "Anima": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.COSMOS,
+            "clip_names": [get_clip_name("clip_qwen3_06b")],
+            "vae_name": get_vae_name("vae_qwen_image"),
+            "model_sampling": ('AuraFlow', settings.default_settings.get("anima_image_shift", 5.0)),
+        },
+        "AuraFlow": {
+            "clip_type": comfy.sd.CLIPType.STABLE_DIFFUSION,
+            "clip_names": [get_clip_name("clip_aura")],
+            "vae_name": get_vae_name("vae_auraflow"),
+            "model_sampling": ('AuraFlow', settings.default_settings.get("auraflow_shift", 1.73))
+        },
+        "BaseModel": {
+            "clip_type": comfy.sd.CLIPType.STABLE_DIFFUSION,
+            "clip_names": [get_clip_name("clip_l")],
+            "vae_name": get_vae_name("vae_sd")
+        },
+        "CosmosPredict2": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.COSMOS,
+            "clip_names": [get_clip_name("clip_oldt5")],
+            "vae_name": get_vae_name("vae_wan")
+        },
+        "ErnieImage": {
+            "latent": "FLUX2",
+            "clip_type": comfy.sd.CLIPType.FLUX2,
+            "clip_names": [get_clip_name("clip_ministral3")],
+            "vae_name": get_vae_name("vae_flux2")
+        },
+        "Flux": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.FLUX,
+            "clip_names": [
+                get_clip_name("clip_l"),
+                get_clip_name("clip_t5")
+            ],
+            "vae_name": get_vae_name("vae_flux")
+        },
+        "Flux2": {
+            "latent": "FLUX2",
+            "clip_type": comfy.sd.CLIPType.FLUX2,
+            "clip_names": [get_clip_name("clip_mistral3")],
+            "vae_name": get_vae_name("vae_flux2")
+        },
+        "Flux2Klein4B": {
+            "latent": "FLUX2",
+            "clip_type": comfy.sd.CLIPType.FLUX2,
+            "clip_names": [get_clip_name("clip_qwen3_4b")],
+            "vae_name": get_vae_name("vae_flux2")
+        },
+        "Flux2Klein9B": {
+            "latent": "FLUX2",
+            "clip_type": comfy.sd.CLIPType.FLUX2,
+            "clip_names": [get_clip_name("clip_qwen3_8b")],
+            "vae_name": get_vae_name("vae_flux2")
+        },
+        "HiDream": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.HIDREAM,
+            "clip_names": [
+                get_clip_name("clip_g"),
+                get_clip_name("clip_l"),
+                get_clip_name("clip_llama"),
+                get_clip_name("clip_t5")
+            ],
+            "vae_name": get_vae_name("vae_flux"),
+            "model_sampling": ('SD3', settings.default_settings.get("hidream_shift", 3.0))
+        },
+        "Lumina2": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.LUMINA2,
+            "clip_names": [get_clip_name("clip_gemma")],
+            "vae_name": get_vae_name("vae_lumina2"),
+            "model_sampling": ('AuraFlow', settings.default_settings.get("lumina2_shift", 3.0))
+        },
+        "NewBieImage": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.NEWBIE,
+            "clip_names": [
+                get_clip_name("clip_gemma3"),
+                get_clip_name("clip_jina"),
+            ],
+            "vae_name": get_vae_name("vae_flux"),
+            "model_sampling": ('AuraFlow', settings.default_settings.get("newbieimage_shift", 6.0))
+        },
+        "PixArt": {
+            "clip_type": comfy.sd.CLIPType.PIXART,
+            "clip_names": [get_clip_name("clip_t5")],
+            "vae_name": get_vae_name("vae_pixart"),
+        },
+        "QwenImage": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.QWEN_IMAGE,
+            "clip_names": [get_clip_name("clip_qwen25")],
+            "vae_name": get_vae_name("vae_qwen_image"),
+            "model_sampling": ('AuraFlow', settings.default_settings.get("qwen_image_shift", 3.10)),
+            "flags": ["has_qwen_encode"]
+        },
+        "SD3": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.SD3,
+            "clip_names": [
+                get_clip_name("clip_l"),
+                get_clip_name("clip_g"),
+                get_clip_name("clip_t5")
+            ],
+            "vae_name": get_vae_name("vae_sd3"),
+            "model_sampling": ('SD3', settings.default_settings.get("sd3_shift", 3.0))
+        },
+        "SDXL": {
+            "clip_type": comfy.sd.CLIPType.STABLE_DIFFUSION,
+            "clip_names": [
+                get_clip_name("clip_l"),
+                get_clip_name("clip_g")
+            ],
+            "vae_name": get_vae_name("vae_sdxl")
+        },
+        "ZImage": {
+            "latent": "SD3",
+            "clip_type": comfy.sd.CLIPType.LUMINA2,
+            "clip_names": [get_clip_name("clip_qwen3_4b")],
+            "vae_name": get_vae_name("vae_lumina2"),
+            "model_sampling": ('AuraFlow', settings.default_settings.get("lumina2_shift", 3.0))
+        },
+    }
+    known_models = known_model_info.keys() # FIXME
+
     xl_base: StableDiffusionModel = None
     xl_base_hash = ""
 
@@ -125,43 +296,6 @@ class pipeline:
     ggml_ops = GGMLOps()
     facefixer = facerestore()
 
-    def get_clip_name(self, shortname):
-        # List of short names and default names for different text encoders
-        defaults = {
-            "clip_aura": "clip_aura.safetensors",
-            "clip_g": "clip_g.safetensors",
-            "clip_gemma": "gemma_2_2b_fp16.safetensors",
-            "clip_gemma3": "gemma_3_4b_it_bf16.safetensors",
-            "clip_jina": "jina_clip_v2_bf16.safetensors",
-            "clip_l": "clip_l.safetensors",
-            "clip_llama": "llama_q2.gguf",
-            "clip_mistral3": "mistral_3_small_flux2_fp8.safetensors",
-            "clip_qwen25": "qwen_2.5_vl_7b_edit-q2_k.gguf",
-            "clip_qwen3_4b": "Qwen3-4B-Q4_K_M.gguf",
-            "clip_qwen3_8b": "Qwen3-8B-Q8_0.gguf",
-            "clip_qwen3_06b": "qwen_3_06b_base.safetensors",
-            "clip_oldt5": "t5xxl_old_fp32-q4_0.gguf",
-            "clip_t5": "t5-v1_1-xxl-encoder-Q3_K_S.gguf",
-        }
-        return settings.default_settings.get(shortname, defaults[shortname] if shortname in defaults else None)
-
-    def get_vae_name(self, shortname):
-        # List of short names and default names for different VAE's
-        defaults = {
-            "vae_auraflow": "auraflow_vae_fp32.safetensors",
-            "vae_flux": "ae.safetensors",
-            "vae_flux2": "flux2-vae.safetensors",
-            "vae_lumina2": "lumina2_vae_fp32.safetensors",
-            "vae_pixart": "pixart_vae_fp16.safetensors",
-            "vae_qwen_image": "qwen_image_vae.safetensors",
-            "vae_sd": "sd15_vae.safetensors",
-            "vae_sd3": "sd3_vae.safetensors",
-            "vae_wan": "pig_wan_vae_fp32-f16.gguf", # FIXME
-            "vae_sdxl": "sdxl_vae.safetensors",
-        }
-        return settings.default_settings.get(shortname, defaults[shortname] if shortname in defaults else None)
-
-    known_models = ["Anima", "AuraFlow", "BaseModel", "CosmosPredict2", "Flux", "Flux2", "Flux2Klein4B", "Flux2Klein9B", "HiDream", "Lumina2", "NewBieImage", "PixArt", "QwenImage", "SD3", "SDXL", "ZImage"]
     def get_clip_and_vae(self, unet):
         unet_type = unet.model.__class__.__name__
 
@@ -181,134 +315,10 @@ class pipeline:
                 # Flux2 Klein 4B
                 unet_type = "Flux2Klein4B"
 
-        if unet_type not in self.known_models:
+        if unet_type not in self.known_model_info.keys():
             unet_type = "SDXL" # Use SDXL as default
-        # Add new model setups here and at "Known models" above.
-        # Simple workflows with "Load models"->"Sample"->"VAE" might work right away.
-        # Add new clip/vae models to settings and pathdb-files.
-        model_info = {
-            "Anima": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.COSMOS,
-                "clip_names": [self.get_clip_name("clip_qwen3_06b")],
-                "vae_name": self.get_vae_name("vae_qwen_image"),
-                "model_sampling": ('AuraFlow', settings.default_settings.get("anima_image_shift", 5.0)),
-            },
-            "AuraFlow": {
-                "clip_type": comfy.sd.CLIPType.STABLE_DIFFUSION,
-                "clip_names": [self.get_clip_name("clip_aura")],
-                "vae_name": self.get_vae_name("vae_auraflow"),
-                "model_sampling": ('AuraFlow', settings.default_settings.get("auraflow_shift", 1.73))
-            },
-            "BaseModel": {
-                "clip_type": comfy.sd.CLIPType.STABLE_DIFFUSION,
-                "clip_names": [self.get_clip_name("clip_l")],
-                "vae_name": self.get_vae_name("vae_sd")
-            },
-            "CosmosPredict2": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.COSMOS,
-                "clip_names": [self.get_clip_name("clip_oldt5")],
-                "vae_name": self.get_vae_name("vae_wan")
-            },
-            "Flux": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.FLUX,
-                "clip_names": [
-                    self.get_clip_name("clip_l"),
-                    self.get_clip_name("clip_t5")
-                ],
-                "vae_name": self.get_vae_name("vae_flux")
-            },
-            "Flux2": {
-                "latent": "FLUX2",
-                "clip_type": comfy.sd.CLIPType.FLUX2,
-                "clip_names": [self.get_clip_name("clip_mistral3")],
-                "vae_name": self.get_vae_name("vae_flux2")
-            },
-            "Flux2Klein4B": {
-                "latent": "FLUX2",
-                "clip_type": comfy.sd.CLIPType.FLUX2,
-                "clip_names": [self.get_clip_name("clip_qwen3_4b")],
-                "vae_name": self.get_vae_name("vae_flux2")
-            },
-            "Flux2Klein9B": {
-                "latent": "FLUX2",
-                "clip_type": comfy.sd.CLIPType.FLUX2,
-                "clip_names": [self.get_clip_name("clip_qwen3_8b")],
-                "vae_name": self.get_vae_name("vae_flux2")
-            },
-            "HiDream": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.HIDREAM,
-                "clip_names": [
-                    self.get_clip_name("clip_g"),
-                    self.get_clip_name("clip_l"),
-                    self.get_clip_name("clip_llama"),
-                    self.get_clip_name("clip_t5")
-                ],
-                "vae_name": self.get_vae_name("vae_flux"),
-                "model_sampling": ('SD3', settings.default_settings.get("hidream_shift", 3.0))
-            },
-            "Lumina2": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.LUMINA2,
-                "clip_names": [self.get_clip_name("clip_gemma")],
-                "vae_name": self.get_vae_name("vae_lumina2"),
-                "model_sampling": ('AuraFlow', settings.default_settings.get("lumina2_shift", 3.0))
-            },
-            "NewBieImage": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.NEWBIE,
-                "clip_names": [
-                    self.get_clip_name("clip_gemma3"),
-                    self.get_clip_name("clip_jina"),
-                ],
-                "vae_name": self.get_vae_name("vae_flux"),
-                "model_sampling": ('AuraFlow', settings.default_settings.get("newbieimage_shift", 6.0))
-            },
-            "PixArt": {
-                "clip_type": comfy.sd.CLIPType.PIXART,
-                "clip_names": [self.get_clip_name("clip_t5")],
-                "vae_name": self.get_vae_name("vae_pixart"),
-            },
-            "QwenImage": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.QWEN_IMAGE,
-                "clip_names": [self.get_clip_name("clip_qwen25")],
-                "vae_name": self.get_vae_name("vae_qwen_image"),
-                "model_sampling": ('AuraFlow', settings.default_settings.get("qwen_image_shift", 3.10)),
-                "flags": ["has_qwen_encode"]
-            },
-            "SD3": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.SD3,
-                "clip_names": [
-                    self.get_clip_name("clip_l"),
-                    self.get_clip_name("clip_g"),
-                    self.get_clip_name("clip_t5")
-                ],
-                "vae_name": self.get_vae_name("vae_sd3"),
-                "model_sampling": ('SD3', settings.default_settings.get("sd3_shift", 3.0))
-            },
-            "SDXL": {
-                "clip_type": comfy.sd.CLIPType.STABLE_DIFFUSION,
-                "clip_names": [
-                    self.get_clip_name("clip_l"),
-                    self.get_clip_name("clip_g")
-                ],
-                "vae_name": self.get_vae_name("vae_sdxl")
-            },
-            "ZImage": {
-                "latent": "SD3",
-                "clip_type": comfy.sd.CLIPType.LUMINA2,
-                "clip_names": [self.get_clip_name("clip_qwen3_4b")],
-                "vae_name": self.get_vae_name("vae_lumina2"),
-                "model_sampling": ('AuraFlow', settings.default_settings.get("lumina2_shift", 3.0))
-            },
-        }
 
-        return model_info.get(unet_type, None)
+        return self.known_model_info.get(unet_type, None)
 
     def load_base_model(self, name, unet_only=False, input_unet=None, hash=None):
         if self.xl_base_hash == name and self.xl_base_patched_extra == set():
@@ -355,22 +365,22 @@ class pipeline:
         if filename.endswith(".gguf") or unet_only:
             with torch.torch.inference_mode():
                 try:
-                    if input_unet is not None:
-                        if isinstance(input_unet, ModelPatcher):
-                            unet = input_unet
-                        else:
-                            unet = comfy.sd.load_diffusion_model_state_dict(
-                                input_unet, model_options={"custom_operations": self.ggml_ops}
-                            )
-                        unet = GGUFModelPatcher.clone(unet)
-                        unet.patch_on_device = True
-                    elif filename.endswith(".gguf"):
+                    if filename.endswith(".gguf"):
                         sd = load_gguf_sd(filename)[0]
                         unet = comfy.sd.load_diffusion_model_state_dict(
                             sd, model_options={"custom_operations": self.ggml_ops}
                         )
                         unet = GGUFModelPatcher.clone(unet)
                         unet.patch_on_device = True
+                    elif input_unet is not None:
+                        if isinstance(input_unet, ModelPatcher):
+                            unet = input_unet
+                        else:
+                            unet = comfy.sd.load_diffusion_model_state_dict(
+                                input_unet, model_options={"custom_operations": self.ggml_ops}
+                            )
+                            unet = GGUFModelPatcher.clone(unet)
+                            unet.patch_on_device = True
                     else:
                         model_options = {}
                         model_options["dtype"] = torch.float8_e4m3fn # FIXME should be a setting
